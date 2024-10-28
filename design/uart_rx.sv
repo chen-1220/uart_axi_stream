@@ -14,14 +14,14 @@ module uart_rx #(
     localparam BIT_PERIOD = CLK_FREQ / BAUD_RATE;
 
     logic   [$clog2(BIT_PERIOD)-1:0]    baud_cnt        ;
-    logic   [$clog2(DATA_WIDTH)-1:0]    bit_cnt         ;
+    logic   [$clog2(DATA_WIDTH):0]      bit_cnt         ;
     logic                               rx_wire_d0      ;
     logic                               rx_wire_d1      ;
     logic                               rx_flag         ;        //1 : 在接收数据，0：未接收数据
     wire                                rx_wire_posedge ;
     
-    //上升沿检测，确定是否准备接收数据
-    assign rx_wire_posedge = rx_wire_d0 & (~rx_wire_d1); 
+    //下降沿检测，确定是否准备接收数据
+    assign rx_wire_posedge = ~rx_wire_d0 & rx_wire_d1; 
     always_ff @(posedge clk or posedge rst) begin
         if (rst) begin
            rx_wire_d0   <=  '0;
@@ -39,7 +39,7 @@ module uart_rx #(
         end
         else begin
             rx_flag <=  rx_wire_posedge? 1'b1 :
-                        m_axis_tvalid?   1'b0 : 1'b1;
+                        m_axis_tvalid?   ~rx_flag : rx_flag;
         end 
     end
     
@@ -80,8 +80,8 @@ module uart_rx #(
     end
 
     always_comb begin
-        m_axis_tdata    = (bit_cnt == DATA_WIDTH + 1)? rx_data[DATA_WIDTH:1] : '0;
-        m_axis_tvalid   = (bit_cnt == DATA_WIDTH + 1)? 1'b1 : 1'b0; 
+        m_axis_tdata    = (bit_cnt == DATA_WIDTH )&&(baud_cnt == BIT_PERIOD/2)? rx_data[DATA_WIDTH:1] : '0;
+        m_axis_tvalid   = (bit_cnt == DATA_WIDTH )&&(baud_cnt == BIT_PERIOD/2)? 1'b1 : 1'b0; 
     end
     
 endmodule
