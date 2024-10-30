@@ -1,5 +1,8 @@
 # UART串口控制器的设计
 
+## UART协议简介
+![UART协议](./doc/uart_protocol.png)
+
 ## 仿真结果
 ![仿真结果](./doc/modelsim_result.png)
 
