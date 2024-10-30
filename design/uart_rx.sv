@@ -18,10 +18,10 @@ module uart_rx #(
     logic                               rx_wire_d0      ;
     logic                               rx_wire_d1      ;
     logic                               rx_flag         ;        //1 : 在接收数据，0：未接收数据
-    wire                                rx_wire_posedge ;
+    wire                                rx_wire_negedge ;
     
     //下降沿检测，确定是否准备接收数据
-    assign rx_wire_posedge = ~rx_wire_d0 & rx_wire_d1; 
+    assign rx_wire_negedge = ~rx_wire_d0 & rx_wire_d1; 
     always_ff @(posedge clk or posedge rst) begin
         if (rst) begin
            rx_wire_d0   <=  '0;
@@ -38,7 +38,7 @@ module uart_rx #(
             rx_flag <=  1'b0;
         end
         else begin
-            rx_flag <=  rx_wire_posedge? 1'b1 :
+            rx_flag <=  rx_wire_negedge? 1'b1 :
                         m_axis_tvalid?   ~rx_flag : rx_flag;
         end 
     end
