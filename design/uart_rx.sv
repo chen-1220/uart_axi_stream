@@ -39,7 +39,7 @@ module uart_rx #(
         end
         else begin
             rx_flag <=  rx_wire_negedge? 1'b1 :
-                        m_axis_tvalid?   ~rx_flag : rx_flag;
+                        m_axis_tvalid?   1'b0 : rx_flag;        //检测到下降沿开始接收信号flag置1，接收完毕flag置0
         end 
     end
     
