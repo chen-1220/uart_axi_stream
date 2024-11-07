@@ -4,6 +4,8 @@ module uart_tb;
     parameter DATA_WIDTH = 8;
     parameter CLK_FREQ   = 50_000_000;
     parameter BAUD_RATE  = 115200;
+    parameter PARITY     = 0;   //0:无校验，1：奇校验，2：偶校验 
+    parameter STOP_BIT   = 1;                 //STOP_BIT个停止位 
 
     logic                   clk             ;
     logic                   rst             ;
@@ -15,6 +17,8 @@ module uart_tb;
     logic                   m_axis_tready   = 1'b1;
     logic                   rx_wire         ;
     logic                   tx_wire         ;
+    logic                   frame_error     ;
+    logic                   parity_error    ;
 
     initial begin
         clk = 0 ;
@@ -43,7 +47,9 @@ module uart_tb;
     uart #(
         .CLK_FREQ      (CLK_FREQ   ),
         .BAUD_RATE     (BAUD_RATE  ),
-        .DATA_WIDTH    (DATA_WIDTH )    
+        .DATA_WIDTH    (DATA_WIDTH ),
+        .PARITY        (PARITY     ),
+        .STOP_BIT      (STOP_BIT   )   
     )u_uart(
         .clk             ,
         .rst             ,
@@ -53,6 +59,8 @@ module uart_tb;
         .m_axis_tdata    ,
         .m_axis_tvalid   ,
         .m_axis_tready   ,
+        .frame_error     ,
+        .parity_error    ,
         .rx_wire         ,
         .tx_wire         
     );
